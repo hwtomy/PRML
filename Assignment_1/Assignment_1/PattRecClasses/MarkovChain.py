@@ -87,8 +87,21 @@ class MarkovChain:
         
         #*** Insert your own code here and remove the following error message 
         
-        print('Not yet implemented')
-
+        mr = DiscreteD(self.q).rand(1)
+        if self.is_finite:
+           n=1
+           while n<tmax:
+               mrnext = DiscreteD(self.A[mr,:]).rand(1)
+               if mrnext==self.nStates+1:
+                     return mr
+               mr = np.append(mr, mrnext)
+               n=n+1
+        else:
+            for n in range(tmax):
+                mrnext = DiscreteD(self.A[mr,:]).rand(1)
+                mr = np.append(mr, mrnext)
+            return mr
+               
     def viterbi(self):
         pass
     

@@ -70,9 +70,18 @@ class HMM:
               nS <= nSamples
         """
         
-        #*** Insert your own code here and remove the following error message 
+       
+        S = self.stateGen.rand(nSamples)
+        maxs = self.dataSize
+        nS = nSamples
+        X = np.zeros((maxs, nS))
+        for i in range(0, nS):
+            if S[i] > maxs + 1:
+                break
+            cur = S[i].astype(np.int64)
+            X[:, i] = self.outputDistr[cur - 1].rand(1)[:, 0]
+        return X, S
         
-        print('Not yet implemented')
         
     def viterbi(self):
         pass

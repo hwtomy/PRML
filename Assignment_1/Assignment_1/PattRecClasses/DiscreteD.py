@@ -27,7 +27,11 @@ class DiscreteD:
         
         #*** Insert your own code here and remove the following error message 
         
-        print('Not yet implemented')
+        N = len(self.probMass)
+        value=np.zeros(N)
+        for i in range(N):
+            value[i] = i+1
+        R = np.random.choice(value, nData, p=self.probMass)
         
         
     def init(self, x):
