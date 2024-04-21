@@ -25,6 +25,7 @@ class MarkovChain:
         self.is_finite = False
         if self.A.shape[0] != self.A.shape[1]:
             self.is_finite = True
+            self.end_state= self.nStates + 1
 
 
     def probDuration(self, tmax):
@@ -94,49 +95,49 @@ class MarkovChain:
             prev_state = S[i - 1]
             pi = self.A[prev_state]
             S[i] = np.random.choice(self.nStates, p=pi)
-            if self.is_finite and S[i] == self.nStates+1:
+            if self.is_finite and S[i] == self.end_state:
                 return S[:i + 1]
         return S
 
 
 def viterbi(self):
-        pass
+    pass
     
-    def stationaryProb(self):
-        pass
+def stationaryProb(self):
+    pass
     
-    def stateEntropyRate(self):
-        pass
+def stateEntropyRate(self):
+    pass
     
-    def setStationary(self):
-        pass
+def setStationary(self):
+    pass
 
-    def logprob(self):
-        pass
+def logprob(self):
+    pass
 
-    def join(self):
-        pass
+def join(self):
+    pass
 
-    def initLeftRight(self):
-        pass
+def initLeftRight(self):
+    pass
     
-    def initErgodic(self):
-        pass
+def initErgodic(self):
+    pass
 
-    def forward(self):
-        pass
+def forward(self):
+     pass
 
-    def finiteDuration(self):
-        pass
+def finiteDuration(self):
+    pass
     
-    def backward(self):
-        pass
+def backward(self):
+    pass
 
-    def adaptStart(self):
-        pass
+def adaptStart(self):
+    pass
 
-    def adaptSet(self):
-        pass
+def adaptSet(self):
+    pass
 
-    def adaptAccum(self):
-        pass
+def adaptAccum(self):
+    pass
