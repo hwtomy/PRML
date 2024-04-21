@@ -69,18 +69,19 @@ class HMM:
           If the StateGen is a finite-duration MarkovChain,
               nS <= nSamples
         """
-        
-       
-        S = self.stateGen.rand(nSamples)
-        maxs = self.dataSize
-        nS = nSamples
-        X = np.zeros((maxs, nS))
-        for i in range(0, nS):
-            if S[i] > maxs + 1:
-                break
-            cur = S[i].astype(np.int64)
-            X[:, i] = self.outputDistr[cur - 1].rand(1)[:, 0]
-        return X, S
+
+        states = self.stateGen.rand(nSamples)  # get states from state gen markov chain
+        numberOfFeatures = len(self.outputDistr[0].rand(1))
+        numberOfStates = len(states)
+        outputs = np.empty(shape=(numberOfFeatures, numberOfStates))
+        for i in range(0, nSamples):
+            curr_state = states[i]
+            if self.stateGen.is_finite and curr_state == self.stateGen.end_state:
+                return outputs[:i + 1], states
+
+            output = self.outputDistr[curr_state].rand(1).ravel(order='F')
+            outputs[:, i] = output;
+        return outputs, states
         
         
     def viterbi(self):

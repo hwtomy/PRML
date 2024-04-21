@@ -86,23 +86,20 @@ class MarkovChain:
         """
         
         #*** Insert your own code here and remove the following error message 
-        
-        mr = DiscreteD(self.q).rand(1)
-        if self.is_finite:
-           n=1
-           while n<tmax:
-               mrnext = DiscreteD(self.A[mr,:]).rand(1)
-               if mrnext==self.nStates+1:
-                     return mr
-               mr = np.append(mr, mrnext)
-               n=n+1
-        else:
-            for n in range(tmax):
-                mrnext = DiscreteD(self.A[mr,:]).rand(1)
-                mr = np.append(mr, mrnext)
-            return mr
-               
-    def viterbi(self):
+
+        S = np.empty(tmax, dtype=int)
+        S[0] = np.random.choice(self.nStates, p=self.q)
+
+        for i in range(1, tmax):
+            prev_state = S[i - 1]
+            pi = self.A[prev_state]
+            S[i] = np.random.choice(self.nStates, p=pi)
+            if self.is_finite and S[i] == self.nStates+1:
+                return S[:i + 1]
+        return S
+
+
+def viterbi(self):
         pass
     
     def stationaryProb(self):
