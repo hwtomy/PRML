@@ -25,7 +25,8 @@ class MarkovChain:
         self.is_finite = False
         if self.A.shape[0] != self.A.shape[1]:
             self.is_finite = True
-            self.end_state= self.nStates + 1
+            self.nStates = self.A.shape[0] + 1
+            self.end_state= self.nStates-1
 
 
     def probDuration(self, tmax):
@@ -89,6 +90,7 @@ class MarkovChain:
         #*** Insert your own code here and remove the following error message 
 
         S = np.empty(tmax, dtype=int)
+    
         S[0] = np.random.choice(self.nStates, p=self.q)
 
         for i in range(1, tmax):
