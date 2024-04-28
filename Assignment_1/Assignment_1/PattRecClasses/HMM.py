@@ -72,13 +72,12 @@ class HMM:
 
         S = self.stateGen.rand(nSamples)
         nS = len(S)
-        X_n_features = len(self.outputDistr[0].rand(1))
-        X_n_samples = nS
-        X = np.empty([X_n_features, X_n_samples])
+        Xfeatures = len()
+        X = np.empty([Xfeatures, nSamples])
         
         for t in range (0, nS):
             current_state = S[t]
-            x = self.outputDistr[current_state - 1].rand(1).ravel(order='F')  # or .flatten()
+            x = self.outputDistr[current_state - 1].rand(1).ravel(order='F') 
             X[:, t] = x
         return X, S  
         
@@ -94,9 +93,17 @@ class HMM:
     def setStationary(self):
         pass
 
-    def logprob(self):
-        pass
+    def logprob(self, xtest):
+        N = len(xtest)
+        Ns = len(self.outputDistr)
+        bmat = np.zeros([Ns, N])
 
+        for i in range(Ns):
+            bmat[i, :] = self.outputDistr[i].prob(xtest)
+
+        aplpha, c = self.stateGen.forward(bmat)
+        return np.sum(np.log(c))
+    
     def adaptStart(self):
         pass
 

@@ -126,14 +126,27 @@ def initLeftRight(self):
 def initErgodic(self):
     pass
 
-def forward(self):
-     pass
+def forward(self, pX):
+    N = pX.shape[1]
+    V = self.A.shape[0]
+    alpha = np.zeros((V, N))
+    c = np.zeros(N)
+    at = np.zeros(V)
 
-def finiteDuration(self):
-    pass
-    
-def backward(self):
-    pass
+    at = self.q.dot(pX[:, 0])  
+    c[0] = np.sum(at)
+    alpha[:, 0] = at / c[0]
+
+    for i in range(1, N):
+        at = self.A.T.dot(alpha[:, i-1]) * pX[:, i]
+        c[i] = np.sum(at)
+        alpha[:, i] = at / c[i]
+
+    if self.is_finite:
+        c = np.append(c, alpha[:, -1].dot(self.A[:, self.end_state]))
+
+    return alpha, c
+
 
 def adaptStart(self):
     pass
@@ -143,3 +156,20 @@ def adaptSet(self):
 
 def adaptAccum(self):
     pass
+
+def backward(self, pX, xtest, c):
+    N = pX.shape[1]
+    V = self.A.shape[0]
+    beta = np.zeros((V, N))
+    ini = np.ones(V)
+
+    if self.is_finite:
+        beta[:, N-1] = self.A[:, V] / (c[N-1] * c[N-1])
+    else:
+        beta[:, N-1] = 1 / c[N-1]
+
+    for i in range(N-2, -1, -1):
+        beta[:, i] = self.A.dot(pX[:, i+1] * beta[:, i+1]) / c[i]
+    
+    return beta
+
