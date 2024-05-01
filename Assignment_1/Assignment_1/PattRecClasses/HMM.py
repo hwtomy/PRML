@@ -72,7 +72,7 @@ class HMM:
 
         S = self.stateGen.rand(nSamples)
         nS = len(S)
-        Xfeatures = len()
+        Xfeatures = len(self.outputDistr[0])
         X = np.empty([Xfeatures, nSamples])
         
         for t in range (0, nS):
@@ -93,16 +93,11 @@ class HMM:
     def setStationary(self):
         pass
 
-    def logprob(self, xtest):
-        N = len(xtest)
-        Ns = len(self.outputDistr)
-        bmat = np.zeros([Ns, N])
-
-        for i in range(Ns):
-            bmat[i, :] = self.outputDistr[i].prob(xtest)
-
-        aplpha, c = self.stateGen.forward(bmat)
-        return np.sum(np.log(c))
+    def logprob(self, c):
+        cl = np.zeros(len(c))
+        for i in range(len(c)):
+            cl[i] = np.log(c[i])
+        return sum(cl)
     
     def adaptStart(self):
         pass
@@ -112,3 +107,18 @@ class HMM:
 
     def adaptAccum(self):
         pass
+
+    def prob(self, xtest, saclet):
+        N = len(xtest)
+        Ns = len(self.outputDistr)
+        bmat = np.zeros([Ns, N])
+
+        for i in range(Ns):
+            for j in range(N):
+                bmat[i, j] = self.outputDistr[i].prob(xtest[j])
+
+        if saclet:
+           for i in range(N):
+               bmat[:, i] = bmat[:, i] / np.amax(bmat[:, i])
+        
+        return bmat

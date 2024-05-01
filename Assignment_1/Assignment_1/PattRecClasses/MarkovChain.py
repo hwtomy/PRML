@@ -20,12 +20,11 @@ class MarkovChain:
         self.A = transition_prob #TransitionProb(i,j)= P[S(t)=j | S(t-1)=i]
 
 
-        self.nStates = transition_prob.shape[0]
+        self.nStates = transition_prob.shape[1]
 
         self.is_finite = False
         if self.A.shape[0] != self.A.shape[1]:
             self.is_finite = True
-            self.nStates = self.A.shape[0] + 1
             self.end_state= self.nStates-1
 
 
@@ -102,74 +101,81 @@ class MarkovChain:
         return S
 
 
-def viterbi(self):
-    pass
+    def viterbi(self):
+        pass
     
-def stationaryProb(self):
-    pass
+    def stationaryProb(self):
+        pass
     
-def stateEntropyRate(self):
-    pass
+    def stateEntropyRate(self):
+        pass
     
-def setStationary(self):
-    pass
+    def setStationary(self):
+        pass
 
-def logprob(self):
-    pass
+    def logprob(self):
+        pass
 
-def join(self):
-    pass
+    def join(self):
+        pass
 
-def initLeftRight(self):
-    pass
+    def initLeftRight(self):
+        pass
     
-def initErgodic(self):
-    pass
+    def initErgodic(self):
+        pass
 
-def forward(self, pX):
-    N = pX.shape[1]
-    V = self.A.shape[0]
-    alpha = np.zeros((V, N))
-    c = np.zeros(N)
-    at = np.zeros(V)
+    def forward(self, pX):
+        N = pX.shape[1]
+        V = self.A.shape[0]
+        alpha = np.zeros((V, N))
+        c = np.zeros(N+1)
+        at = np.zeros(V)
 
-    at = self.q.dot(pX[:, 0])  
-    c[0] = np.sum(at)
-    alpha[:, 0] = at / c[0]
+        at = self.q*pX[:, 0] 
+        c[0] = np.sum(at)
+        alpha[:, 0] = at / c[0]
+       
 
-    for i in range(1, N):
-        at = self.A.T.dot(alpha[:, i-1]) * pX[:, i]
-        c[i] = np.sum(at)
-        alpha[:, i] = at / c[i]
+        for t in range(1, N):
+            for j in range(V):
+                at[j] = pX[j,t]*(alpha[:, t-1]@self.A[:, j])
+            c[t] = np.sum(at)
+            alpha[:,t] = at/c[t]
+        if self.is_finite:
+            c[N] = alpha[:, N-1]@self.A[:, self.A.shape[1] - 1]
+        else:
+            c = np.delete(c, N)
+            
 
-    if self.is_finite:
-        c = np.append(c, alpha[:, -1].dot(self.A[:, self.end_state]))
-
-    return alpha, c
+        return alpha, c
 
 
-def adaptStart(self):
-    pass
+    def adaptStart(self):
+        pass
 
-def adaptSet(self):
-    pass
+    def adaptSet(self):
+        pass
 
-def adaptAccum(self):
-    pass
+    def adaptAccum(self):
+        pass
 
-def backward(self, pX, xtest, c):
-    N = pX.shape[1]
-    V = self.A.shape[0]
-    beta = np.zeros((V, N))
-    ini = np.ones(V)
+    def backward(self, pX, c):
+        N = pX.shape[1]
+        V = self.A.shape[0]
+        beta = np.zeros((V, N))
+        
 
-    if self.is_finite:
-        beta[:, N-1] = self.A[:, V] / (c[N-1] * c[N-1])
-    else:
-        beta[:, N-1] = 1 / c[N-1]
+        if self.is_finite:
+            beta[:, N-1] = self.A[:, V] / (c[N] * c[N-1])
+        else:
+            beta[:, N-1] = 1 / c[N-1]
 
-    for i in range(N-2, -1, -1):
-        beta[:, i] = self.A.dot(pX[:, i+1] * beta[:, i+1]) / c[i]
-    
-    return beta
+        for i in range(N-2, -1, -1):
+            for j in range(V):
+                 for k in range(V):
+                        beta[j, i] += self.A[j, k]*pX[k, i+1]*beta[k, i+1]
+                 beta[j, i] = beta[j, i] / c[i] 
+        
+        return beta
 
