@@ -171,11 +171,11 @@ class MarkovChain:
         else:
             beta[:, N-1] = 1 / c[N-1]
 
+
         for i in range(N-2, -1, -1):
             for j in range(V):
-                 for k in range(V):
-                        beta[j, i] += self.A[j, k]*pX[k, i+1]*beta[k, i+1]
-                 beta[j, i] = beta[j, i] / c[i] 
+                beta[j, i] += self.A[j, 0:V]@(pX[:, i+1]*beta[:, i+1])
+                beta[j, i] = beta[j, i] / c[i] 
         
         return beta
 
