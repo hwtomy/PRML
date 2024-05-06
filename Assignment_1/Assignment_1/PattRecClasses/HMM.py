@@ -72,7 +72,7 @@ class HMM:
 
         S = self.stateGen.rand(nSamples)
         nS = len(S)
-        Xfeatures = len(self.outputDistr[0])
+        Xfeatures = len(self.outputDistr[0].rand(1))
         X = np.empty([Xfeatures, nSamples])
         
         for t in range (0, nS):
